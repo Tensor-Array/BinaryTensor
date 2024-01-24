@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "options": {
+        "cwd": "${workspaceFolder}/build"
+    },
+    "tasks": [
+        {
+            "label": "cmake",
+            "command": "cmake",
+            "args": [
+                ".."
+            ]
+        },
+        {
+            "label": "cpack",
+            "command": "cpack",
+            "args": [
+                "-C",
+                "CPackConfig.cmake"
+            ]
+        },
+        {
+            "label": "make-install",
+            "command": "make",
+            "args": [
+                "install"
+            ]
+        },
+        {
+            "label": "make-test",
+            "command": "make",
+            "args": [
+                "test"
+            ]
+        },
+        {
+            "label": "cmake build",
+            "dependsOn": [
+                "cmake",
+                "make-install"
+            ],
+            "problemMatcher": [
+                "$nvcc"
+            ]
+        }
+    ]
+}
