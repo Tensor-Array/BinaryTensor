@@ -1,6 +1,6 @@
 ## Calculating loss
 
-Normally, you are calculating loss by:
+Normally, you are calculating loss by this:
 
 ```
 loss = pow((a - b), 2)
