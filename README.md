@@ -11,5 +11,3 @@ This library only using tensor that have only 1 bit per layer value. and only us
 All arithmetic operators have been replaced with bitwise operator.
 
 Build your own binary neural network models with this library.
-
-.
