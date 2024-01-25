@@ -9,15 +9,15 @@ RUN apt-get update && apt-get -y install cmake
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
 
-WORKDIR /tensor-array
+WORKDIR /binary-tensor
 COPY src/ ./src/
 COPY CMakeLists.txt ./
 COPY Config.cmake.in ./
-WORKDIR /tensor-array
+WORKDIR /binary-tensor
 
-WORKDIR /tensor-array/build
+WORKDIR /binary-tensor/build
 
 RUN cmake ..
 RUN make install
 
-WORKDIR /tensor-array
+WORKDIR /binary-tensor

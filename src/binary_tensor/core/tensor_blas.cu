@@ -113,6 +113,57 @@ namespace binary_tensor
             c[wrapBatch * M * N + warpM * N + warpN] = Cvalue;
         }
 
+        Tensor matmul(const Tensor& a, const Tensor& b, bool is_derive, const DataBuffer&)
+		{
+			cudaError cudaStat;
+			devices::Device this_cuda{ devices::CUDA };
+			cudaStat = cudaGetDevice(&this_cuda.index);
+			cudaDeviceProp cu_dev_prop;
+			cudaStat = cudaGetDeviceProperties(&cu_dev_prop, this_cuda.index);
+			TensorBase base_a = a.get_buffer().change_device(this_cuda);
+			TensorBase base_b = b.get_buffer().change_device(this_cuda);
+			const std::initializer_list<unsigned int> shape_a = base_a.shape();
+			const std::initializer_list<unsigned int> shape_b = base_b.shape();
+			assert(shape_a.size() == 2 && shape_b.size() == 2 && shape_a.end()[-1] == shape_b.end()[-2]);
+			std::vector<std::pair<Tensor, Derivation>> temp;
+			if (is_derive)
+			{
+				temp.push_back(std::make_pair(a, Derivation(b.transpose(shape_b.size() - 2, shape_b.size() - 1, false), matmul, false)));
+				temp.push_back(std::make_pair(b, Derivation(a.transpose(shape_a.size() - 2, shape_a.size() - 1, false), matmul, true)));
+			}
+			void* c_ptr;
+
+			unsigned int batch_size = 1U;
+			for (std::size_t i = 0; i < shape_a.size() - 2; i++)
+				batch_size = shape_a.begin()[i];
+
+			cudaStat = cudaMalloc(&c_ptr, batch_size * shape_a.end()[-2] * shape_b.end()[-1]);
+			cudaStat = cudaMemset(c_ptr, 0, batch_size * shape_a.end()[-2] * shape_b.end()[-1]);
+
+            constexpr unsigned int thread_value_x = 1U;
+            constexpr unsigned int thread_value_y = 32U;
+            constexpr unsigned int thread_value_z = 32U;
+            dim3 block_dim(thread_value_x, thread_value_y, thread_value_z);
+			dim3 grid_dim
+            (
+                batch_size / block_dim.x + (batch_size % block_dim.x  ? 1U : 0U),
+                shape_a.end()[-2] / block_dim.y + (shape_a.end()[-2] % block_dim.y ? 1U : 0U),
+                shape_b.end()[-1] / block_dim.z + (shape_b.end()[-1] % block_dim.z ? 1U : 0U)
+            );
+            kernel_matmul_GEMM<<<grid_dim, block_dim>>>
+            (
+                batch_size,
+                shape_a.end()[-2], shape_b.end()[-1], shape_a.end()[-1],
+                static_cast<uint1_t_x8*>(c_ptr),
+                static_cast<const uint1_t_x8*>(base_a.data()),
+                static_cast<const uint1_t_x8*>(base_b.data())
+            );
+
+			TensorBase value_buf({ batch_size, shape_a.end()[-2] , shape_b.end()[-1] }, c_ptr, this_cuda);
+			cudaStat = cudaFree(c_ptr);
+			return Tensor(std::move(value_buf), std::move(temp));
+		}
+
         Tensor batchedmatmul(const Tensor& a, const Tensor& b, bool is_derive, const DataBuffer&)
 		{
 			cudaError cudaStat;
