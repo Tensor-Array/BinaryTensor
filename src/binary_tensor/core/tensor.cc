@@ -357,11 +357,12 @@ namespace binary_tensor
         }
 
         std::mutex calc_grad_mutex;
-        void Tensor::calc_grad()
+
+        void Tensor::calc_grad(const Tensor& base_grad)
         {
             std::lock_guard calc_grad_lock(calc_grad_mutex);
             this->tensor_data->reset_grad();
-            this->tensor_data->calc_grad(ones(this->get_buffer().shape()));
+            this->tensor_data->calc_grad(base_grad);
         }
 
         Tensor Tensor::transpose(unsigned char dim0, unsigned char dim1, bool is_derive) const
@@ -511,6 +512,26 @@ namespace binary_tensor
             return multiply(*this, ones(this->get_buffer().shape()));
         }
 
+        Tensor operator&(const Tensor& a, const Tensor& b)
+        {
+            return bitwise_AND(a, b);
+        }
+
+        Tensor operator|(const Tensor& a, const Tensor& b)
+        {
+            return bitwise_OR(a, b);
+        }
+
+        Tensor operator^(const Tensor& a, const Tensor& b)
+        {
+            return bitwise_XOR(a, b);
+        }
+
+        Tensor operator~(const Tensor& value_in)
+        {
+            return bitwise_NOT(value_in);
+        }
+
         Tensor operator+(const Tensor& a, const Tensor& b)
         {
             return add(a, b);
@@ -519,6 +540,21 @@ namespace binary_tensor
         Tensor Tensor::operator-() const
         {
             return multiply(*this, ones(this->get_buffer().shape()));
+        }
+
+        Tensor& Tensor::operator&=(const Tensor& other)
+        {
+            return this->operator=((*this) & other);
+        }
+
+        Tensor& Tensor::operator|=(const Tensor& other)
+        {
+            return this->operator=((*this) | other);
+        }
+
+        Tensor& Tensor::operator^=(const Tensor& other)
+        {
+            return this->operator=((*this) ^ other);
         }
 
         Tensor& Tensor::operator+=(const Tensor& other)
@@ -596,6 +632,29 @@ namespace binary_tensor
                 out_stream << static_cast<uint1_t_x8>(tensor_out);
             }
             return out_stream;
+        }
+
+        Tensor bitwise_AND(const Tensor& a, const Tensor& b)
+        {
+            std::pair<Tensor, Tensor> broadcast_t = tensor_broadcasting(a, b);
+            return bitwise_AND(broadcast_t.first, broadcast_t.second, true, nullptr);
+        }
+
+        Tensor bitwise_OR(const Tensor& a, const Tensor& b)
+        {
+            std::pair<Tensor, Tensor> broadcast_t = tensor_broadcasting(a, b);
+            return bitwise_OR(broadcast_t.first, broadcast_t.second, true);
+        }
+
+        Tensor bitwise_XOR(const Tensor& a, const Tensor& b)
+        {
+            std::pair<Tensor, Tensor> broadcast_t = tensor_broadcasting(a, b);
+            return bitwise_XOR(broadcast_t.first, broadcast_t.second, true);
+        }
+
+        Tensor bitwise_NOT(const Tensor& value_in)
+        {
+            return bitwise_NOT(value_in);
         }
 
         Tensor add(const Tensor& a, const Tensor& b)

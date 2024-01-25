@@ -1,3 +1,6 @@
+Before you read this, you need to read:<br>
+[operator](operator.md)
+
 ## Calculating loss
 
 Normally, you are calculating loss by:

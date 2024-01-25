@@ -148,7 +148,7 @@ namespace binary_tensor
             Slice correct_slice(const Slice&) const;
             bool& multithread_derive();
             long tensor_use_count();
-            void calc_grad();
+            void calc_grad(const Tensor&);
             Iterator begin() const;
             Iterator end() const;
             Iterator cbegin() const;
@@ -196,6 +196,12 @@ namespace binary_tensor
 
             Tensor operator-() const;
 
+            Tensor& operator&=(const Tensor&);
+
+            Tensor& operator|=(const Tensor&);
+
+            Tensor& operator^=(const Tensor&);
+
             Tensor& operator+=(const Tensor&);
 
             Tensor& operator-=(const Tensor&);
@@ -205,6 +211,14 @@ namespace binary_tensor
             Tensor reduce_sum(unsigned char) const;
 #ifdef TENSOR_CONTENT
             friend Tensor tensor_rand(const std::initializer_list<unsigned int>&, unsigned int);
+
+            friend Tensor bitwise_XOR(const Tensor&, const Tensor&, bool);
+
+            friend Tensor bitwise_AND(const Tensor&, const Tensor&, bool, const DataBuffer&);
+
+            friend Tensor bitwise_OR(const Tensor&, const Tensor&, bool);
+
+            friend Tensor bitwise_NOT(const Tensor&, bool);
             
             friend Tensor add(const Tensor&, const Tensor&, bool);
 
@@ -259,6 +273,14 @@ namespace binary_tensor
 
         CUDA_ML_API dimension operator/(const dimension&, const dimension&);
 
+        CUDA_ML_API Tensor operator&(const Tensor&, const Tensor&);
+
+        CUDA_ML_API Tensor operator|(const Tensor&, const Tensor&);
+
+        CUDA_ML_API Tensor operator^(const Tensor&, const Tensor&);
+
+        CUDA_ML_API Tensor operator~(const Tensor&);
+
         /**
          * \brief Plus 2 n-d tensors.
          * \param other The tensor that plus with this.
@@ -279,6 +301,10 @@ namespace binary_tensor
 
         CUDA_ML_API Tensor operator/(const Tensor&, const Tensor&);
         CUDA_ML_API Tensor tensor_file_load(const char*);
+        CUDA_ML_API Tensor bitwise_AND(const Tensor&, const Tensor&);
+        CUDA_ML_API Tensor bitwise_OR(const Tensor&, const Tensor&);
+        CUDA_ML_API Tensor bitwise_XOR(const Tensor&, const Tensor&);
+        CUDA_ML_API Tensor bitwise_NOT(const Tensor&);
         CUDA_ML_API Tensor add(const Tensor&, const Tensor&);
         CUDA_ML_API Tensor multiply(const Tensor&, const Tensor&);
         CUDA_ML_API Tensor dot(const Tensor&, const Tensor&);
@@ -378,3 +404,5 @@ struct std::equal_to<binary_tensor::value::Tensor>
         return std::equal_to<std::shared_ptr<binary_tensor::value::Tensor::TensorContent>>()(a.tensor_data, b.tensor_data);
     }
 };
+
+#undef CUDA_ML_API

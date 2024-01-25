@@ -1,11 +1,11 @@
 {
     "version": "2.0.0",
-    "options": {
-        "cwd": "${workspaceFolder}/build"
-    },
     "tasks": [
         {
             "label": "cmake",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
             "command": "cmake",
             "args": [
                 ".."
@@ -13,6 +13,9 @@
         },
         {
             "label": "cpack",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
             "command": "cpack",
             "args": [
                 "-C",
@@ -21,6 +24,9 @@
         },
         {
             "label": "make-install",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
             "command": "make",
             "args": [
                 "install"
@@ -28,6 +34,9 @@
         },
         {
             "label": "make-test",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
             "command": "make",
             "args": [
                 "test"

@@ -50,28 +50,74 @@ struct uint1_t_x8
 
 #if defined(__cplusplus)
 #include <iostream>
+
+template <typename _CharT, typename _Traits>
+inline std::basic_ostream<_CharT, _Traits>& operator<<(std::basic_ostream<_CharT, _Traits>& stream, uint1_t_x8 value)
+{
+    unsigned int temp;
+    temp = value.bit_0;
+    stream << temp;
+    temp = value.bit_1;
+    stream << temp;
+    temp = value.bit_2;
+    stream << temp;
+    temp = value.bit_3;
+    stream << temp;
+    temp = value.bit_4;
+    stream << temp;
+    temp = value.bit_5;
+    stream << temp;
+    temp = value.bit_6;
+    stream << temp;
+    temp = value.bit_7;
+    stream << temp;
+    return stream;
+}
+
+template <typename _CharT, typename _Traits>
+inline std::basic_istream<_CharT, _Traits>& operator>>(std::basic_istream<_CharT, _Traits>& stream, uint1_t_x8 value)
+{
+    unsigned int temp;
+    stream >> temp;
+    value.bit_0 = temp;
+    stream >> temp;
+    value.bit_1 = temp;
+    stream >> temp;
+    value.bit_2 = temp;
+    stream >> temp;
+    value.bit_3 = temp;
+    stream >> temp;
+    value.bit_4 = temp;
+    stream >> temp;
+    value.bit_5 = temp;
+    stream >> temp;
+    value.bit_6 = temp;
+    stream >> temp;
+    value.bit_7 = temp;
+    return stream;
+}
+
+__binary_tensor_DEVICE_CODE__ uint1_t_x8 operator+(const uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8 operator-(const uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8 operator*(const uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8 operator/(const uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8 operator&(const uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8 operator|(const uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8 operator^(const uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8& operator+=(uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8& operator-=(uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8& operator*=(uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8& operator/=(uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8& operator&=(uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8& operator|=(uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8& operator^=(uint1_t_x8&, const uint1_t_x8&);
+__binary_tensor_DEVICE_CODE__ uint1_t_x8 operator~(const uint1_t_x8&);
+
 namespace binary_tensor
 {
     namespace dtype
     {
         using ::uint1_t_x8;
-        std::ostream& operator<<(std::ostream&, const uint1_t_x8&);
-        std::istream& operator>>(std::istream&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8 operator+(const uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8 operator-(const uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8 operator*(const uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8 operator/(const uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8 operator&(const uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8 operator|(const uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8 operator^(const uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8& operator+=(uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8& operator-=(uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8& operator*=(uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8& operator/=(uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8& operator&=(uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8& operator|=(uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8& operator^=(uint1_t_x8&, const uint1_t_x8&);
-        __binary_tensor_DEVICE_CODE__ uint1_t_x8 operator~(const uint1_t_x8&);
     }
     
 }

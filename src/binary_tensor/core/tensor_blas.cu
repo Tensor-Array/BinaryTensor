@@ -113,6 +113,43 @@ namespace binary_tensor
             c[wrapBatch * M * N + warpM * N + warpN] = Cvalue;
         }
 
+        bool equal_dim_size(const TensorBase& a, const TensorBase& b);
+
+        Tensor dot(const Tensor& a, const Tensor& b, bool is_derive, const DataBuffer&)
+		{
+			std::vector<std::pair<Tensor, Derivation>> temp;
+			if (is_derive)
+			{
+				temp.push_back(std::make_pair(a, Derivation(b, dot)));
+				temp.push_back(std::make_pair(b, Derivation(a, dot)));
+			}
+			TensorBase other_buf;
+			cudaError cudaStat;
+			void* in_ptr;
+			devices::Device this_cuda{ devices::CUDA };
+			cudaStat = cudaGetDevice(&this_cuda.index);
+			cudaDeviceProp cu_dev_prop;
+			cudaStat = cudaGetDeviceProperties(&cu_dev_prop, this_cuda.index);
+			TensorBase base_a = a.get_buffer().change_device(this_cuda);
+			TensorBase base_b = b.get_buffer().change_device(this_cuda);
+			if (equal_dim_size(base_a, base_b))
+			{
+				other_buf = TensorBase({}, in_ptr, this_cuda);
+				cudaStat = cudaFree(in_ptr);
+			}
+			if (base_a.shape().size() == 0)
+			{
+				other_buf = TensorBase(base_b.shape(), in_ptr, this_cuda);
+				cudaStat = cudaFree(in_ptr);
+			}
+			if (base_b.shape().size() == 0)
+			{
+				other_buf = TensorBase(base_a.shape(), in_ptr, this_cuda);
+				cudaStat = cudaFree(in_ptr);
+			}
+			return Tensor(std::move(other_buf), std::move(temp));
+		}
+
         Tensor matmul(const Tensor& a, const Tensor& b, bool is_derive, const DataBuffer&)
 		{
 			cudaError cudaStat;

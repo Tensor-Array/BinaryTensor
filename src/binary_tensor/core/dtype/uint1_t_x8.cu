@@ -34,77 +34,79 @@ __host__ __device__ uint1_t_x8::operator unsigned char() const
 
 __device__ uint1_t_x8 atomicAdd(uint1_t_x8*, uint1_t_x8);
 
+__host__ __device__ uint1_t_x8 operator&(const uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return static_cast<const unsigned char&>(a) & static_cast<const unsigned char&>(b);
+}
+
+__host__ __device__ uint1_t_x8 operator|(const uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return static_cast<const unsigned char&>(a) | static_cast<const unsigned char&>(b);
+}
+
+__host__ __device__ uint1_t_x8 operator^(const uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return static_cast<const unsigned char&>(a) ^ static_cast<const unsigned char&>(b);
+}
+
+__host__ __device__ uint1_t_x8 operator~(const uint1_t_x8& values)
+{
+    return ~static_cast<const unsigned char&>(values);
+}
+
+__host__ __device__ uint1_t_x8 operator+(const uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return a ^ b;
+}
+
+__host__ __device__ uint1_t_x8 operator-(const uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return a ^ b;
+}
+
+__host__ __device__ uint1_t_x8 operator*(const uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return a & b;
+}
+
+__host__ __device__ uint1_t_x8 operator/(const uint1_t_x8& a, const uint1_t_x8& b);
+
+__host__ __device__ uint1_t_x8& operator&=(uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return (a = a & b);
+}
+
+__host__ __device__ uint1_t_x8& operator|=(uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return (a = a | b);
+}
+
+__host__ __device__ uint1_t_x8& operator^=(uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return (a = a ^ b);
+}
+
+__host__ __device__ uint1_t_x8& operator+=(uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return (a = a + b);
+}
+
+__host__ __device__ uint1_t_x8& operator-=(uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return (a = a - b);
+}
+
+__host__ __device__ uint1_t_x8& operator*=(uint1_t_x8& a, const uint1_t_x8& b)
+{
+    return (a = a * b);
+}
+
+__host__ __device__ uint1_t_x8& operator/=(uint1_t_x8& a, const uint1_t_x8& b);
+
 namespace binary_tensor
 {
     namespace dtype
     {
-        __host__ __device__ uint1_t_x8 operator&(const uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return static_cast<const unsigned char&>(a) & static_cast<const unsigned char&>(b);
-        }
 
-        __host__ __device__ uint1_t_x8 operator|(const uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return static_cast<const unsigned char&>(a) | static_cast<const unsigned char&>(b);
-        }
-
-        __host__ __device__ uint1_t_x8 operator^(const uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return static_cast<const unsigned char&>(a) ^ static_cast<const unsigned char&>(b);
-        }
-
-        __host__ __device__ uint1_t_x8 operator~(const uint1_t_x8& values)
-        {
-            return ~static_cast<const unsigned char&>(values);
-        }
-
-        __host__ __device__ uint1_t_x8 operator+(const uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return a ^ b;
-        }
-
-        __host__ __device__ uint1_t_x8 operator-(const uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return a ^ b;
-        }
-
-        __host__ __device__ uint1_t_x8 operator*(const uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return a & b;
-        }
-
-        __host__ __device__ uint1_t_x8 operator/(const uint1_t_x8& a, const uint1_t_x8& b);
-
-        __host__ __device__ uint1_t_x8& operator&=(uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return (a = a & b);
-        }
-
-        __host__ __device__ uint1_t_x8& operator|=(uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return (a = a | b);
-        }
-
-        __host__ __device__ uint1_t_x8& operator^=(uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return (a = a ^ b);
-        }
-
-        __host__ __device__ uint1_t_x8& operator+=(uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return (a = a + b);
-        }
-
-        __host__ __device__ uint1_t_x8& operator-=(uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return (a = a - b);
-        }
-
-        __host__ __device__ uint1_t_x8& operator*=(uint1_t_x8& a, const uint1_t_x8& b)
-        {
-            return (a = a * b);
-        }
-
-        __host__ __device__ uint1_t_x8& operator/=(uint1_t_x8& a, const uint1_t_x8& b);
     }
 }

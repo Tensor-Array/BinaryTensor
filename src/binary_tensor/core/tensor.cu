@@ -66,6 +66,38 @@ namespace binary_tensor
 		}
 
 		template <typename T>
+		__global__ void bitwise_AND_2_arr(T c[], const T a[], const T b[], unsigned int c_size)
+		{
+			unsigned int thread_x = blockIdx.x * blockDim.x + threadIdx.x;
+			if (thread_x < c_size)
+				c[thread_x] = a[thread_x] & b[thread_x];
+		}
+
+		template <typename T>
+		__global__ void bitwise_OR_2_arr(T c[], const T a[], const T b[], unsigned int c_size)
+		{
+			unsigned int thread_x = blockIdx.x * blockDim.x + threadIdx.x;
+			if (thread_x < c_size)
+				c[thread_x] = a[thread_x] | b[thread_x];
+		}
+
+		template <typename T>
+		__global__ void bitwise_XOR_2_arr(T c[], const T a[], const T b[], unsigned int c_size)
+		{
+			unsigned int thread_x = blockIdx.x * blockDim.x + threadIdx.x;
+			if (thread_x < c_size)
+				c[thread_x] = a[thread_x] ^ b[thread_x];
+		}
+
+		template <typename T>
+		__global__ void bitwise_NOT_arr(T value_out[], const T value_in[], unsigned int c_size)
+		{
+			unsigned int thread_x = blockIdx.x * blockDim.x + threadIdx.x;
+			if (thread_x < c_size)
+				value_out[thread_x] = ~value_in[thread_x];
+		}
+
+		template <typename T>
 		__global__ void sum_2_arr(T c[], const T a[], const T b[], unsigned int c_size)
 		{
 			unsigned int thread_x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -204,6 +236,45 @@ namespace binary_tensor
 			return other_buf;
 		}
 
+		Tensor bitwise_AND(const Tensor& a, const Tensor& b, bool is_derive, const DataBuffer&)
+		{
+			assert(equal_dim_size(a.get_buffer(), b.get_buffer()));
+			std::vector<std::pair<Tensor, Derivation>> temp;
+			if (is_derive)
+			{
+				temp.push_back(std::make_pair(a, Derivation(b.clone(), bitwise_AND)));
+				temp.push_back(std::make_pair(b, Derivation(a.clone(), bitwise_AND)));
+			}
+			cudaError cuda_status;
+			TensorBase other_buf;
+			void* c_ptr;
+			devices::Device this_cuda{ devices::CUDA };
+			cuda_status = cudaGetDevice(&this_cuda.index);
+			cudaDeviceProp cu_dev_prop;
+			cuda_status = cudaGetDeviceProperties(&cu_dev_prop, this_cuda.index);
+			TensorBase base_a = a.get_buffer().change_device(this_cuda);
+			TensorBase base_b = b.get_buffer().change_device(this_cuda);
+			std::size_t c_size = std::max
+			(
+				a.get_buffer().data_size() / get_sizeof_type(a.get_buffer().type()),
+				b.get_buffer().data_size() / get_sizeof_type(b.get_buffer().type())
+			);
+			cuda_status = cudaMalloc(&c_ptr, std::max(a.get_buffer().data_size(), b.get_buffer().data_size()));
+			dim3 block_dim(cu_dev_prop.maxThreadsDim[0]);
+			dim3 grid_dim(c_size / block_dim.x + (c_size % block_dim.x ? 1U : 0U));
+#define ADD_CODE(TYPE) \
+if(a.get_buffer().type() == typeid(TYPE) && b.get_buffer().type() == typeid(TYPE)) \
+{ \
+bitwise_AND_2_arr<<<grid_dim, block_dim>>>(static_cast<TYPE*>(c_ptr), static_cast<const TYPE*>(base_a.data()), static_cast<const TYPE*>(base_b.data()), c_size); \
+cuda_status = cudaDeviceSynchronize(); \
+other_buf = TensorBase(a.get_buffer().shape(), c_ptr, this_cuda); \
+}
+			LOOP(USING_DATA_TYPE);
+#undef ADD_CODE
+			cuda_status = cudaFree(c_ptr);
+			return Tensor(std::move(other_buf), std::move(temp));
+		}
+
 		Tensor multiply(const Tensor& a, const Tensor& b, bool is_derive, const DataBuffer&)
 		{
 			assert(equal_dim_size(a.get_buffer(), b.get_buffer()));
@@ -284,6 +355,82 @@ other_buf = TensorBase(bool_value.get_buffer().shape(), ptr_out, this_cuda); \
 #undef ADD_CODE
 			cuda_status = cudaFree(ptr_out);
 			return Tensor(std::move(other_buf), std::move(temp));
+		}
+
+		Tensor bitwise_XOR(const Tensor& a, const Tensor& b, bool is_derive)
+		{
+			assert(equal_dim_size(a.get_buffer(), b.get_buffer()));
+			std::vector<std::pair<Tensor, Derivation>> temp;
+			if (is_derive)
+			{
+				temp.push_back(std::make_pair(a, Derivation(ones(a.get_buffer().shape()), bitwise_AND)));
+				temp.push_back(std::make_pair(b, Derivation(ones(b.get_buffer().shape()), bitwise_AND)));
+			}
+			cudaError cuda_status;
+			TensorBase other_buf;
+			void* c_ptr;
+			devices::Device this_cuda{ devices::CUDA };
+			cuda_status = cudaGetDevice(&this_cuda.index);
+			cudaDeviceProp cu_dev_prop;
+			cuda_status = cudaGetDeviceProperties(&cu_dev_prop, this_cuda.index);
+			TensorBase base_a = a.get_buffer().change_device(this_cuda);
+			TensorBase base_b = b.get_buffer().change_device(this_cuda);
+			std::size_t c_size = std::max
+			(
+				a.get_buffer().data_size() / get_sizeof_type(a.get_buffer().type()),
+				b.get_buffer().data_size() / get_sizeof_type(b.get_buffer().type())
+			);
+			cuda_status = cudaMalloc(&c_ptr, std::max(a.get_buffer().data_size(), b.get_buffer().data_size()));
+			dim3 block_dim(cu_dev_prop.maxThreadsDim[0]);
+			dim3 grid_dim(c_size / block_dim.x + (c_size % block_dim.x ? 1U : 0U));
+#define ADD_CODE(TYPE) \
+if(a.get_buffer().type() == typeid(TYPE) && b.get_buffer().type() == typeid(TYPE)) \
+{ \
+bitwise_XOR_2_arr<<<grid_dim, block_dim>>>(static_cast<TYPE*>(c_ptr), static_cast<const TYPE*>(base_a.data()), static_cast<const TYPE*>(base_b.data()), c_size); \
+cuda_status = cudaDeviceSynchronize(); \
+other_buf = TensorBase(a.get_buffer().shape(), c_ptr, this_cuda); \
+}
+			LOOP(USING_DATA_TYPE);
+#undef ADD_CODE
+			cuda_status = cudaFree(c_ptr);
+			return Tensor(std::move(other_buf), std::move(temp));
+		}
+
+		Tensor bitwise_NOT(const Tensor& a, bool is_derive)
+		{
+			std::vector<std::pair<Tensor, Derivation>> temp;
+			if (is_derive)
+			{
+				temp.push_back(std::make_pair(a, Derivation(ones(a.get_buffer().shape()), bitwise_AND)));
+			}
+			cudaError cuda_status;
+			TensorBase other_buf;
+			void* c_ptr;
+			devices::Device this_cuda{ devices::CUDA };
+			cuda_status = cudaGetDevice(&this_cuda.index);
+			cudaDeviceProp cu_dev_prop;
+			cuda_status = cudaGetDeviceProperties(&cu_dev_prop, this_cuda.index);
+			TensorBase base_a = a.get_buffer().change_device(this_cuda);
+			std::size_t c_size = a.get_buffer().data_size() / get_sizeof_type(a.get_buffer().type());
+			cuda_status = cudaMalloc(&c_ptr, a.get_buffer().data_size());
+			dim3 block_dim(cu_dev_prop.maxThreadsDim[0]);
+			dim3 grid_dim(c_size / block_dim.x + (c_size % block_dim.x ? 1U : 0U));
+#define ADD_CODE(TYPE) \
+if(a.get_buffer().type() == typeid(TYPE)) \
+{ \
+bitwise_NOT_arr<<<grid_dim, block_dim>>>(static_cast<TYPE*>(c_ptr), static_cast<const TYPE*>(base_a.data()), c_size); \
+cuda_status = cudaDeviceSynchronize(); \
+other_buf = TensorBase(a.get_buffer().shape(), c_ptr, this_cuda); \
+}
+			LOOP(USING_DATA_TYPE);
+#undef ADD_CODE
+			cuda_status = cudaFree(c_ptr);
+			return Tensor(std::move(other_buf), std::move(temp));
+		}
+
+		Tensor bitwise_OR(const Tensor& a, const Tensor& b, bool is_derive)
+		{
+			return bitwise_NOT(bitwise_AND(bitwise_NOT(a, is_derive), bitwise_NOT(b, is_derive), is_derive, DataBuffer()), is_derive);
 		}
 
 		Tensor add(const Tensor& a, const Tensor& b, bool is_derive)

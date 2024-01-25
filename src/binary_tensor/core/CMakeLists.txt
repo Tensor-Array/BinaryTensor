@@ -10,7 +10,7 @@ set(CMAKE_CUDA_ARCHITECTURES 52 75 89)
 set(CMAKE_CUDA_SEPARABLE_COMPILATION TRUE)
 set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "--default-stream per-thread")
 
-file(GLOB BinaryTensor_src "dtype/*.cu" "dtype/*.cc" "*.cc" "*.cu")
+file(GLOB BinaryTensor_src "dtype/*.cu" "*.cc" "*.cu")
 
 # file(MAKE_DIRECTORY "include/tensor_array/core")
 
