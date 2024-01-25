@@ -11,6 +11,7 @@ RUN apt-get update && apt-get -y install cmake
 
 WORKDIR /binary-tensor
 COPY src/ ./src/
+COPY test/ ./test/
 COPY CMakeLists.txt ./
 COPY Config.cmake.in ./
 WORKDIR /binary-tensor
