@@ -7,11 +7,11 @@ Currently we are using 4 of these bitwise operator to work with this one-bit mac
 3. XOR
 4. OR
 
-## Convert from arthimetic to bitwise.
+## Convert from arithmetic to bitwise.
 
-Because this project is using one bit data type. We can convert from arthimetic operators to bitwise operators. Because bitwise operators are faster than arthimetic operators.
+Because this project is using one bit data type. We can convert from arithmetic operators to bitwise operators. Because bitwise operators are faster than arithmetic operators.
 
-| Arthimetic | Bitwise | Example | Converted |
+| Arithmetic | Bitwise | Example | Converted |
 |:-:|:-:|:-----:|:-----:|
 | + | ^ | a + b | a ^ b |
 | - | ^ | a - b | a ^ b |
