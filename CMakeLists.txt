@@ -17,6 +17,11 @@ install(
 add_subdirectory("src/binary_tensor/core")
 add_subdirectory("test")
 
+enable_testing()
+add_test(
+    NAME TestBinary
+    COMMAND binarytensor_test)
+
 set(CPACK_PACKAGE_NAME "BinaryTensor")
 set(CPACK_PACKAGE_VENDOR "TensorArray-Creators")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY)
