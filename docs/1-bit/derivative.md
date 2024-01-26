@@ -24,7 +24,7 @@ Here are some derivative rules that only using one bit and bitwise operators.
 | Rules | Function | Derivative |
 |:-|:-:|:-:|
 | AND by constant | c & f(x) | c & f’(x) |
-| AND rule | f(x) & g(x) | f’(x) & g’(x) |
-| XOR rule | f(x) ^ g(x) | (f’(x) & g(x)) ^ (f(x) & g’(x)) |
+| XOR rule | f(x) ^ g(x) | f’(x) ^ g’(x) |
+| AND rule | f(x) & g(x) | (f’(x) & g(x)) ^ (f(x) & g’(x)) |
 | NOT rule | ~ f(x) | f’(x) |
 | Chain rule | f(g(x)) | f’(g(x)) & g’(x) |
