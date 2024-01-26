@@ -161,7 +161,7 @@ namespace binary_tensor
 			TensorBase base_b = b.get_buffer().change_device(this_cuda);
 			const std::initializer_list<unsigned int> shape_a = base_a.shape();
 			const std::initializer_list<unsigned int> shape_b = base_b.shape();
-			assert(shape_a.size() == 2 && shape_b.size() == 2 && shape_a.end()[-1] == shape_b.end()[-2]);
+			assert(shape_a.size() == 2 &&shape_b.size() == 2 && shape_a.end()[-1] == shape_b.end()[-2]);
 			std::vector<std::pair<Tensor, Derivation>> temp;
 			if (is_derive)
 			{
@@ -196,7 +196,7 @@ namespace binary_tensor
                 static_cast<const uint1_t_x8*>(base_b.data())
             );
 
-			TensorBase value_buf({ batch_size, shape_a.end()[-2] , shape_b.end()[-1] }, c_ptr, this_cuda);
+			TensorBase value_buf({ shape_a.end()[-2] , shape_b.end()[-1] }, c_ptr, this_cuda);
 			cudaStat = cudaFree(c_ptr);
 			return Tensor(std::move(value_buf), std::move(temp));
 		}
@@ -212,7 +212,7 @@ namespace binary_tensor
 			TensorBase base_b = b.get_buffer().change_device(this_cuda);
 			const std::initializer_list<unsigned int> shape_a = base_a.shape();
 			const std::initializer_list<unsigned int> shape_b = base_b.shape();
-			assert(shape_a.size() == shape_b.size() && std::memcmp(shape_a.begin(), shape_b.begin(), std::min(shape_a.size(), shape_b.size()) - 2) && shape_a.end()[-1] == shape_b.end()[-2]);
+			assert(shape_a.size() == shape_b.size() && std::memcmp(shape_a.begin(), shape_b.begin(), std::min(shape_a.size(), shape_b.size()) - 2) == 0 && shape_a.end()[-1] == shape_b.end()[-2]);
 			std::vector<std::pair<Tensor, Derivation>> temp;
 			if (is_derive)
 			{
@@ -247,7 +247,10 @@ namespace binary_tensor
                 static_cast<const uint1_t_x8*>(base_b.data())
             );
 
-			TensorBase value_buf({ batch_size, shape_a.end()[-2] , shape_b.end()[-1] }, c_ptr, this_cuda);
+            std::vector<unsigned int> out_dims = shape_a;
+            out_dims[out_dims.size() - 1] = shape_b.end()[-1];
+
+			TensorBase value_buf(out_dims, c_ptr, this_cuda);
 			cudaStat = cudaFree(c_ptr);
 			return Tensor(std::move(value_buf), std::move(temp));
 		}
